@@ -37,6 +37,9 @@ Deep Super Learner: A Deep Ensemble for Classification Problems by Steven Young,
 
 See deepSuperLearner/example.py for full example.
 
+![Alt text](example.PNG?raw=true "Example results on sklearn simple binary classification data")
+
+
 ### Notes: 
 1. For running example you need to install the XGB python lib as it is used as a base learner just as done in the paper.
 2. Although the algorithm is implemented for classification problems, it can be modified to perform on regression problems aswell.
