@@ -57,9 +57,6 @@ class DeepSuperLearner(BaseEstimator):
         
         
         """
-#         invp = _inv_segmoid(self.trim_func(m_set_predictions))
-#         weights_probs = _segmoid(np.stack([np.dot(invp[:,:,i],weights) 
-#                   for i in range(invp.shape[-1])]).T)
         trimp = self.trim_func(m_set_predictions)
         weights_probs = np.stack([np.dot(trimp[:, :, i], weights) 
                   for i in range(trimp.shape[-1])]).T
@@ -144,12 +141,12 @@ class DeepSuperLearner(BaseEstimator):
     
     def fit(self, X, y, max_iterations=20, sample_weight=None):
         """
-        Fit DeepSuperLearner.
+        Fit DeepSuperLearner on training data (X,y).
 
         Parameters
         ----------
-        X : numpy array of shape [n,l features]
-        y : numpy array of shape [n,j] 
+        X : numpy array of shape [n,l] (Training samples with their l-features per sample) 
+        y : numpy array of shape [n] (Classification Ground-truth)
         
         Attributes
         ----------
@@ -248,6 +245,27 @@ class DeepSuperLearner(BaseEstimator):
 
 
     def get_precision_recall(self, X_test, y_test, show_graphs=False):
+        """
+        Calculate the precision and recall metrics per label and if wanted
+        display a graph of results of deep-super-learner against all other base-learners.
+
+        Parameters
+        ----------
+        X_test: numpy array of shape [n,l] (Testing set with its features per sample)
+
+        y_test: numpy array of shape [n] (Classification ground-truth)
+        
+        Attributes
+        ----------
+        show_graphs: boolean to indicate whether a graph is required for results.
+        
+        Returns
+        -------
+        dsl_recall_scores: python list of size l (number of classes) that represent the recall score per label.
+        dsl_precision_scores: python list of size l (number of classes) that represent the precision score per label.
+        bl_recall_scores: python list of size [m,l] that represent the recall scores per label per base-learner.
+        bl_precision_scores: python list of size [m,l] that represent the precision scores per label per base-learner.
+        """        
         dsl_probs, base_learners_probs = \
         self.predict(X_test, return_base_learners_probs=True)
         _, labels_count = dsl_probs.shape
@@ -270,13 +288,9 @@ class DeepSuperLearner(BaseEstimator):
             ax1 = plt.subplot2grid((3, 1), (0, 0), rowspan=2)
             ax2 = plt.subplot2grid((3, 1), (2, 0))
             ax1.set_ylabel("Recall")
-            # ax1.set_xlabel("Label Index")
-            # ax1.set_ylim([-0.05, 1.05])
-            # ax1.legend(loc="upper center")
             ax1.set_title('Recall rates of the different learners')
             ax2.set_ylabel("Precision")
             ax2.set_xlabel("Label Index")
-            # ax2.set_ylim([-0.05, 1.05])
             ax2.set_title('Precision rates of the different learners')
             ax1.plot(label_indice, dsl_recall_scores, "s--",
                      label="{}".format(self.__class__.__name__), linewidth=2.0)
@@ -296,22 +310,6 @@ class DeepSuperLearner(BaseEstimator):
         return dsl_recall_scores, dsl_precision_scores, \
                 bl_recall_scores, bl_precision_scores
         
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 def _inv_segmoid(p):
     """
     Calculate the inverse of the segmoid a.k.a the logit function.
