@@ -310,36 +310,6 @@ class DeepSuperLearner(BaseEstimator):
         return dsl_recall_scores, dsl_precision_scores, \
                 bl_recall_scores, bl_precision_scores
         
-def _inv_segmoid(p):
-    """
-    Calculate the inverse of the segmoid a.k.a the logit function.
-    
-    Paramters
-    ---------
-    p: numpy.array of numbers between 0 and 1
-
-    Returns
-    -------
-    Inverse_segmoid(p)
-    """
-    return np.log(p / (1 - p))
-
-def _segmoid(x):
-    """
-    Calculates the segmoid
-
-    Paramters
-    ---------
-    x: numpy.array of real numbers
-
-    Returns
-    -------
-    Segmoid(x)
-
-    """
-    
-    return 1 / (1 + np.exp(-x))
-
 
 
     
