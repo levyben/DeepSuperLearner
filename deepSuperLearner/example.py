@@ -6,7 +6,7 @@ from sklearn.ensemble.forest import RandomForestClassifier
 from xgboost.sklearn import XGBClassifier
 import numpy as np
 from sklearn import datasets
-from deepSuperLearnerLib import DeepSuperLearner
+from deepSuperLearner import *
 from sklearn.dummy import DummyClassifier
 from sklearn.model_selection import train_test_split
 
@@ -25,5 +25,5 @@ if __name__ == '__main__':
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     
     DSL_learner = DeepSuperLearner(Base_learners)
-    DSL_learner.fit(X_train, y_train)
+    DSL_learner.fit(X_train, y_train,max_iterations=20,sample_weight=None)
     DSL_learner.get_precision_recall(X_test, y_test, show_graphs=True)    

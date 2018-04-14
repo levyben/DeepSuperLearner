@@ -8,7 +8,7 @@ setup(
     packages=['deepSuperLearner'],
     url='https://github.com/levyben/DeepSuperLearner',
     license='MIT',
-    long_description=open('README').read(),
+    long_description=open('README.md').read(),
     requires=[
         "scipy (>= 1.0.1)",
         "numpy (>= 1.14.2)",

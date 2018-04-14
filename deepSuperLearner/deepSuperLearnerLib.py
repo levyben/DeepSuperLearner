@@ -1,6 +1,6 @@
 import numpy as np
-from scipy.optimize import fmin_l_bfgs_b, nnls, fmin_slsqp
-from sklearn.base import BaseEstimator, RegressorMixin
+from scipy.optimize import fmin_slsqp
+from sklearn.base import BaseEstimator
 from sklearn.metrics import log_loss
 from sklearn.model_selection import StratifiedKFold
 from sklearn import clone
@@ -10,20 +10,27 @@ import matplotlib.pyplot as plt
 
 
 
-class DeepSuperLearner(object):
+class DeepSuperLearner(BaseEstimator):
     '''
-    classdocs
+    DeepSuperLearner ensemble method of learners for classification.
+    
+    Parameters
+    ----------
+    blearner: python dictionary of learner name with its instance. {'SVM':svm_instance} for instance.
+
+    Attributes
+    ----------
+    K: KFolds integer used for training.
     '''
+    
 
-
-    def __init__(self, blearners, K=5, sample_weight=None):
+    def __init__(self, blearners, K=5):
         self.BL = blearners
         self.Kfolds = K
         self.coef_optimization_method = 'SLSQP'
         self.n_baselearners = len(blearners)
         self.trim_eps = 1e-5
         self.trim_func = lambda x: np.clip(x, self.trim_eps, 1 - self.trim_eps)
-        self.sample_weight = sample_weight
         self.weights_per_iteration = []
         self.fitted_learners_per_iteration = []
         self.__classes_n = 0
@@ -59,7 +66,7 @@ class DeepSuperLearner(object):
         return weights_probs
 
     
-    def _get_logloss(self, y, y_pred):
+    def _get_logloss(self, y, y_pred, sample_weight=None):
         """
         Calculate the normalized logloss given ground-truth y and y-predictions
 
@@ -68,14 +75,18 @@ class DeepSuperLearner(object):
         y: numpy array of shape [n,j] (ground-truth)
 
         y_pred: numpy array of shape [n,j] (predictions)
-
+        
+        Attributes
+        ----------
+        sample_weight: numpy array of shape [n,]
+        
         Returns
         -------
         Logloss: estimated logloss of ground-truth and predictions.
 
         """
         return log_loss(y, y_pred, eps=self.trim_eps,
-                        sample_weight=self.sample_weight)
+                        sample_weight=sample_weight)
     
     def _get_weights(self, y, m_set_predictions_fold):
         """
@@ -131,7 +142,7 @@ class DeepSuperLearner(object):
                             .format(bl.__class__.__name__))
         return pred
     
-    def fit(self, X, y, max_iterations=20):
+    def fit(self, X, y, max_iterations=20, sample_weight=None):
         """
         Fit DeepSuperLearner.
 
@@ -139,6 +150,12 @@ class DeepSuperLearner(object):
         ----------
         X : numpy array of shape [n,l features]
         y : numpy array of shape [n,j] 
+        
+        Attributes
+        ----------
+        max_iterations: maximum number of iterations until convergance.
+        sample_weight: numpy array of shape [n,]
+        
         Returns
         -------
         self : returns an instance of self.
@@ -160,7 +177,10 @@ class DeepSuperLearner(object):
                 for i, baselrn in enumerate(self.BL.items()):
                     name, bl = baselrn
                     baselearner = clone(bl)
-                    baselearner.fit(X_train, y_train)
+                    try:
+                        baselearner.fit(X_train, y_train, sample_weight=sample_weight)
+                    except TypeError as e:
+                        baselearner.fit(X_train, y_train)
                     fitted_learners_per_fold[fold_i, i] = baselearner
                     y_pred_fold[test_index, i, :] = self._get_prediction(baselearner, X_test)
             
