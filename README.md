@@ -2,7 +2,7 @@
 This is a [sklearn](http://scikit-learn.org/stable/)
 implementation of the machine-learning DeepSuperLearner algorithm, A Deep Ensemble method for Classification Problems.
 
-For details about DeepSuperLearner please refer to the [https://arxiv.org/pdf/1803.02323.pdf](https://arxiv.org/pdf/1803.02323.pdf):
+For details about DeepSuperLearner please refer to the [https://arxiv.org/abs/1803.02323](https://arxiv.org/abs/1803.02323):
 Deep Super Learner: A Deep Ensemble for Classification Problems by Steven Young, Tamer Abdou, and Ayse Bener.
 
 ### Installation and demo
